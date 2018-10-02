@@ -1,0 +1,11 @@
+.idea
+.pytest_cache
+bin
+deploy
+lib
+venv
+pyvenv.cfg
+pip-selfcheck.json
+__pycache__/
+*.pyc
+.DS_Store
