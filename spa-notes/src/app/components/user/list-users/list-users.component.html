@@ -1,0 +1,76 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <div fxFill fxLayout="row" fxLayoutAlign="start center">
+        <div fxFlex="100">
+          <span>ユーザー管理</span>
+        </div>
+      </div>
+    </mat-toolbar>
+    <!-- Page Content -->
+    <div class="note-master-content">
+      <!-- search and result-->
+      <div fxLayout="column" fxLayoutAlign="space-around space-around" fxLayoutGap="5px">
+        <div fxFlex class="result-table-container">
+          <div>
+            <mat-progress-bar mode="indeterminate" *ngIf="loading"></mat-progress-bar>
+          </div>
+          <div fxFlexFill class="mat-elevation-z8">
+            <table fxFlexFill mat-table [dataSource]="displayUsers">
+
+              <ng-container matColumnDef="userUuid">
+                <th mat-header-cell *matHeaderCellDef>ユーザーID</th>
+                <td mat-cell *matCellDef="let element"> {{element.userUuid || '-'}}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>メールアドレス</th>
+                <td mat-cell *matCellDef="let element"> {{element.email || '-'}}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="displayUserName">
+                <th mat-header-cell *matHeaderCellDef>氏名</th>
+                <td mat-cell *matCellDef="let element"> {{element.displayUserName || '-'}}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="organizationId">
+                <th mat-header-cell *matHeaderCellDef>グループID</th>
+                <td mat-cell *matCellDef="let element"> {{element.organizationId}}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="company">
+                <th mat-header-cell *matHeaderCellDef>企業名</th>
+                <td mat-cell *matCellDef="let element"> {{element.company || '-'}}</td>
+              </ng-container>
+
+
+              <ng-container matColumnDef="createdAt">
+                <th mat-header-cell *matHeaderCellDef>作成日時</th>
+                <td mat-cell *matCellDef="let element"> {{toJst(element.createdAt) || '-'}}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="updatedAt">
+                <th mat-header-cell *matHeaderCellDef>更新日時</th>
+                <td mat-cell *matCellDef="let element"> {{toJst(element.updatedAt) || '-'}}</td>
+              </ng-container>
+
+              <!-- Edit Column -->
+
+              <!-- Delete Column -->
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+            <div *ngIf="lastEvaluatedKey" fxFlexFill fxLayoutAlign="center center">
+              <button fxFlexFill mat-button color="basic" (click)="getUsers(lastEvaluatedKey)">
+                <mat-icon>expand_more</mat-icon>
+                さらに読み込む
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Page Content -->
+  </mat-sidenav-content>
+</mat-sidenav-container>
