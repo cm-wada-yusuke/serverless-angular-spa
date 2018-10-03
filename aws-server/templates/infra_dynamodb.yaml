@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  NoteAlertSnsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: NoteAlert
+      TopicName: !Sub ${Env}-note-alert-topic
+  NoteUserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref NoteUserTableName
+      AttributeDefinitions:
+      - AttributeName: user_uuid
+        AttributeType: S
+      - AttributeName: organization_id
+        AttributeType: S
+      - AttributeName: updated_at
+        AttributeType: N
+      KeySchema:
+      - AttributeName: user_uuid
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref UserTypeRcu
+        WriteCapacityUnits: !Ref UserTypeWcu
+      GlobalSecondaryIndexes:
+      - IndexName: user_organization_id-index
+        KeySchema:
+        - AttributeName: organization_id
+          KeyType: HASH
+        - AttributeName: updated_at
+          KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
+        ProvisionedThroughput:
+          ReadCapacityUnits: !Ref UserTypeRcu
+          WriteCapacityUnits: !Ref UserTypeWcu
+  NoteUserTableReadThrottleEventsAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmName: !Sub ${NoteUserTableName}-ReadCapacityUnitsLimit-BasicAlarm
+      AlarmDescription: 'Lower ReadCapacityUnitsUtilizationTarget or increase MaxReadCapacityUnits.'
+      Namespace: 'AWS/DynamoDB'
+      MetricName: ConsumedReadCapacityUnits
+      Dimensions:
+      - Name: TableName
+        Value: !Ref NoteUserTableName
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 5
+      Threshold: 48
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+      - !Ref NoteAlertSnsTopic
+      OKActions:
+      - !Ref NoteAlertSnsTopic
+      TreatMissingData: missing
+  NoteUserTableWriteThrottleEventsAlarm:
+    Type: 'AWS::CloudWatch::Alarm'
+    Properties:
+      AlarmName: !Sub ${NoteUserTableName}-WriteCapacityUnitsLimit-BasicAlarm
+      AlarmDescription: 'Lower WriteCapacityUnitsUtilizationTarget or increase MaxWriteCapacityUnits.'
+      Namespace: 'AWS/DynamoDB'
+      MetricName: ConsumedWriteCapacityUnits
+      Dimensions:
+      - Name: TableName
+        Value: !Ref NoteUserTableName
+      Statistic: Average
+      Period: 60
+      EvaluationPeriods: 5
+      Threshold: 48
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+      - !Ref NoteAlertSnsTopic
+      OKActions:
+      - !Ref NoteAlertSnsTopic
+      TreatMissingData: missing
+

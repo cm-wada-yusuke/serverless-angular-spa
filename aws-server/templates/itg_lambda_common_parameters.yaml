@@ -1,0 +1,22 @@
+Parameters:
+  CommitId:
+    Default: '000000000'
+    Type: String
+  DynamoDBEndpoint:
+    Default: /itg/lambda/DynamoDBEndpoint
+    Type: AWS::SSM::Parameter::Value<String>
+  Env:
+    Default: /itg/lambda/Env
+    Type: AWS::SSM::Parameter::Value<String>
+  NoteUserTableName:
+    Default: /itg/lambda/NoteUserTableName
+    Type: AWS::SSM::Parameter::Value<String>
+  UserListLimit:
+    Default: /itg/lambda/UserListLimit
+    Type: AWS::SSM::Parameter::Value<String>
+  UserTypeRcu:
+    Default: /itg/lambda/UserTypeRcu
+    Type: AWS::SSM::Parameter::Value<String>
+  UserTypeWcu:
+    Default: /itg/lambda/UserTypeWcu
+    Type: AWS::SSM::Parameter::Value<String>
