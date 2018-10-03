@@ -22,7 +22,6 @@ export class ListUsersComponent {
   displayedColumns: string[] = [
     'email',
     'displayUserName',
-    'organizationId',
     'company',
     'createdAt',
     'updatedAt'
