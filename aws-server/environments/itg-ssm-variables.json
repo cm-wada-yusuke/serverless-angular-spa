@@ -1,0 +1,26 @@
+[
+  {
+    "Name": "Env",
+    "Value": "itg"
+  },
+  {
+    "Name": "DynamoDBEndpoint",
+    "Value": "https://dynamodb.ap-northeast-1.amazonaws.com/"
+  },
+  {
+    "Name": "NoteUserTableName",
+    "Value": "${env}-user"
+  },
+  {
+    "Name": "UserTypeRcu",
+    "Value": "1"
+  },
+  {
+    "Name": "UserTypeWcu",
+    "Value": "1"
+  },
+  {
+    "Name": "UserListLimit",
+    "Value": "2"
+  }
+]

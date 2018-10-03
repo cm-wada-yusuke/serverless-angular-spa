@@ -8,3 +8,8 @@ body { margin: 0; font-family: 'Roboto', sans-serif; }
 @import '~@angular/material/theming';
 $custom-typography: mat-typography-config($font-family: '"Helvetica Neue", Helvetica, Arial, "游ゴシック体", "Yu Gothic", YuGothic, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;');
 @include mat-core($custom-typography);
+
+
+.result-table-container {
+  padding: 10px;
+}

@@ -1,0 +1,164 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  NoteGetUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${Env}-note-get-user
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/${Env}-note-lambda
+      KmsKeyArn: !GetAtt NoteLambdaKmsKey.Arn
+      Handler: handlers/user/get_user.lambda_handler
+      Runtime: python3.6
+      CodeUri: src/functions
+      Timeout: 5
+      Environment:
+        Variables:
+          ENV: !Ref Env
+          DYNAMODB_ENDPOINT: !Ref DynamoDBEndpoint
+          NOTE_USER_TABLE_NAME: !Ref NoteUserTableName
+          USER_LIST_LIMIT: !Ref UserListLimit
+  NoteGetUsers:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${Env}-note-get-users
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/${Env}-note-lambda
+      KmsKeyArn: !GetAtt NoteLambdaKmsKey.Arn
+      Handler: handlers/user/get_users.lambda_handler
+      Runtime: python3.6
+      CodeUri: src/functions
+      Timeout: 5
+      Environment:
+        Variables:
+          ENV: !Ref Env
+          DYNAMODB_ENDPOINT: !Ref DynamoDBEndpoint
+          NOTE_USER_TABLE_NAME: !Ref NoteUserTableName
+          USER_LIST_LIMIT: !Ref UserListLimit
+  NoteCreateUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${Env}-note-create-user
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/${Env}-note-lambda
+      KmsKeyArn: !GetAtt NoteLambdaKmsKey.Arn
+      Handler: handlers/user/create_user.lambda_handler
+      Runtime: python3.6
+      CodeUri: src/functions
+      Timeout: 5
+      Environment:
+        Variables:
+          ENV: !Ref Env
+          DYNAMODB_ENDPOINT: !Ref DynamoDBEndpoint
+          NOTE_USER_TABLE_NAME: !Ref NoteUserTableName
+          USER_LIST_LIMIT: !Ref UserListLimit
+  NoteUpdateUser:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${Env}-note-update-user
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/${Env}-note-lambda
+      KmsKeyArn: !GetAtt NoteLambdaKmsKey.Arn
+      Handler: handlers/user/update_user.lambda_handler
+      Runtime: python3.6
+      CodeUri: src/functions
+      Timeout: 5
+      Environment:
+        Variables:
+          ENV: !Ref Env
+          DYNAMODB_ENDPOINT: !Ref DynamoDBEndpoint
+          NOTE_USER_TABLE_NAME: !Ref NoteUserTableName
+          USER_LIST_LIMIT: !Ref UserListLimit
+
+  NoteLambdaKmsKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: Note app kms key.
+      KeyPolicy:
+        Id: key-consolepolicy-3
+        Version: '2012-10-17'
+        Statement:
+        - Sid: Enable IAM User Permissions
+          Effect: Allow
+          Principal:
+            AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+          Action: kms:*
+          Resource: "*"
+        - Sid: Allow use of the key
+          Effect: Allow
+          Principal:
+            AWS:
+            - !GetAtt NoteLambdaRole.Arn
+          Action:
+          - kms:Encrypt
+          - kms:Decrypt
+          - kms:ReEncrypt*
+          - kms:GenerateDataKey*
+          - kms:DescribeKey
+          Resource: "*"
+        - Sid: Allow attachment of persistent resources
+          Effect: Allow
+          Principal:
+            AWS:
+            - !GetAtt NoteLambdaRole.Arn
+          Action:
+          - kms:CreateGrant
+          - kms:ListGrants
+          - kms:RevokeGrant
+          Resource: "*"
+          Condition:
+            Bool:
+              kms:GrantIsForAWSResource: true
+  NoteLambdaKmsKeyAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub 'alias/${Env}/note/lambda'
+      TargetKeyId: !Ref NoteLambdaKmsKey
+  NoteLambdaRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub ${Env}-note-lambda
+      ManagedPolicyArns:
+      - 'arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess'
+      - 'arn:aws:iam::aws:policy/AmazonKinesisFullAccess'
+      - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+      - 'arn:aws:iam::aws:policy/AmazonCognitoPowerUser'
+      Policies:
+      - PolicyName: KmsDecryptPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            Effect: Allow
+            Action:
+            - kms:Encrypt
+            - kms:Decrypt
+            Resource:
+            - !Sub 'arn:aws:kms:*:${AWS::AccountId}:key/*'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        -
+          Effect: 'Allow'
+          Principal:
+            Service:
+            - 'lambda.amazonaws.com'
+          Action:
+          - 'sts:AssumeRole'
+Parameters:
+  CommitId:
+    Default: '000000000'
+    Type: String
+  DynamoDBEndpoint:
+    Default: /itg/lambda/DynamoDBEndpoint
+    Type: AWS::SSM::Parameter::Value<String>
+  Env:
+    Default: /itg/lambda/Env
+    Type: AWS::SSM::Parameter::Value<String>
+  NoteUserTableName:
+    Default: /itg/lambda/NoteUserTableName
+    Type: AWS::SSM::Parameter::Value<String>
+  UserListLimit:
+    Default: /itg/lambda/UserListLimit
+    Type: AWS::SSM::Parameter::Value<String>
+  UserTypeRcu:
+    Default: /itg/lambda/UserTypeRcu
+    Type: AWS::SSM::Parameter::Value<String>
+  UserTypeWcu:
+    Default: /itg/lambda/UserTypeWcu
+    Type: AWS::SSM::Parameter::Value<String>
