@@ -8,7 +8,7 @@ import { Moment } from 'moment';
 @Component({
   selector: 'app-list-notes',
   templateUrl: './list-notes.component.html',
-  styleUrls: ['./list-notes.component.css']
+  styleUrls: []
 })
 export class ListNotesComponent {
 
